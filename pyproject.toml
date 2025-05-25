@@ -1,0 +1,70 @@
+[project]
+name = "stroke-prediction-api"
+version = "0.1.0"
+description = "A FastAPI application for stroke prediction using machine learning models."
+authors = [{ name = "Promchai Chooseang" }, { name = "Pannatorn Sriwongpan" }]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.115.12",
+    "loguru>=0.7.3",
+    "python-dotenv>=1.1.0",
+    "scikit-learn>=1.6.1",
+    "pandas>=2.2.3",
+    "catboost>=1.2.8",
+]
+
+[dependency-groups]
+eda = ["dython>=0.7.9", "seaborn>=0.13.2"]
+
+dev = [
+    "ruff>=0.11.10",
+    "ipykernel>=6.29.5",
+    "poethepoet>=0.34.0",
+    "lefthook>=1.11.13",
+    "pdoc>=15.0.3"
+]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.ruff]
+indent-width = 4
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+extend-select = ["I"] # Add import sorting
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.poe]
+executor.type = "auto"
+
+[tool.poe.tasks.sync]
+help = "Sync the enironment with the requirements in pyproject.toml"
+cmd = "uv sync"
+
+[tool.poe.tasks.clean]
+help = "Delete all compiled Python files"
+sequence = [
+    { cmd = "find . -type f -name '*.py[co]' -delete" },
+    { cmd = "find . -type d -name '__pycache__' -delete" },
+]
+
+[tool.poe.tasks.lint]
+help = "Check formatting and lint with ruff"
+sequence = [{ cmd = "ruff format --check" }, { cmd = "ruff check" }]
+
+[tool.poe.tasks.format]
+help = "Fix and format source code using ruff"
+sequence = [{ cmd = "ruff check --fix" }, { cmd = "ruff format" }]
+
+[tool.poe.tasks.docs]
+help = "Generate documentation using pdoc"
+cmd = "pdoc ds_salaries_predict --docformat numpy --math"

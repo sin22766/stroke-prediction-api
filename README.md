@@ -1,0 +1,2 @@
+# Stroke Prediction using Machine Learning
+This project aims to predict the likelihood of a stroke using machine learning techniques. The dataset used for this project is sourced from Kaggle and contains various health-related features.

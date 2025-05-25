@@ -1,0 +1,5 @@
+[core]
+    remote = s3_remote
+['remote "s3_remote"']
+    url = s3://mlops-data
+    endpointurl = https://c3c2990e88540a177e1af72afb62be32.r2.cloudflarestorage.com
