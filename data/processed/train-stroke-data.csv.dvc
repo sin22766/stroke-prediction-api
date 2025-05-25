@@ -1,0 +1,5 @@
+outs:
+- md5: ed512972d9640a24aaf48cc660aa3a21
+  size: 263830
+  hash: md5
+  path: train-stroke-data.csv

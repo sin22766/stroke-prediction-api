@@ -1,0 +1,5 @@
+outs:
+- md5: 0f395c5079e1dc383787c881e9e04217
+  size: 75216
+  hash: md5
+  path: test-stroke-data.csv
