@@ -1,5 +1,5 @@
 [project]
-name = "stroke-prediction-api"
+name = "stroke-prediction"
 version = "0.1.0"
 description = "A FastAPI application for stroke prediction using machine learning models."
 authors = [{ name = "Promchai Chooseang" }, { name = "Pannatorn Sriwongpan" }]
