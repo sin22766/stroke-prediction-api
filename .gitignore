@@ -18,4 +18,6 @@ wheels/
 # Environment variables
 .env
 
+# Catboost files
+catboost_info/
 picture/
