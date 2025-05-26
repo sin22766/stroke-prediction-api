@@ -1,2 +1,2 @@
-/train-stroke-data.csv
-/test-stroke-data.csv
+/train-stroke-data.feather
+/test-stroke-data.feather

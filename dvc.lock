@@ -10,14 +10,14 @@ stages:
       size: 316971
     - path: src/stroke_prediction/preprocess.py
       hash: md5
-      md5: 7e246d1198703e31b22e7415e51e48e3
-      size: 5811
+      md5: 5135129a37ef93fabfa750ce797d0890
+      size: 5817
     outs:
-    - path: data/processed/test-stroke-data.csv
+    - path: data/processed/test-stroke-data.feather
       hash: md5
-      md5: 52b67f5919ac8bc5ca93f30026b00668
-      size: 61078
-    - path: data/processed/train-stroke-data.csv
+      md5: 4f7552f2b160a5133e65cdc790d425a6
+      size: 29210
+    - path: data/processed/train-stroke-data.feather
       hash: md5
-      md5: 79cb379eb38185ceb0241e7331a94300
-      size: 243526
+      md5: 6ccc24aec3e688c616311e697ed54d92
+      size: 88866

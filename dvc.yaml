@@ -5,5 +5,5 @@ stages:
     - data/raw/healthcare-dataset-stroke-data.csv
     - src/stroke_prediction/preprocess.py
     outs:
-    - data/processed/train-stroke-data.csv
-    - data/processed/test-stroke-data.csv
+    - data/processed/train-stroke-data.feather
+    - data/processed/test-stroke-data.feather
