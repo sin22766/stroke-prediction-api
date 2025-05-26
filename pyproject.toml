@@ -26,7 +26,7 @@ dev = [
     "poethepoet>=0.34.0",
     "lefthook>=1.11.13",
     "pdoc>=15.0.3",
-    "pyarrow>=20.0.0",
+    "fastparquet>=2024.11.0",
 ]
 
 [tool.uv]

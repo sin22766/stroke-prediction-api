@@ -156,19 +156,19 @@ def preprocess_data(
     train_data = pd.concat([X_train_df, y_train.reset_index(drop=True)], axis=1)
     test_data = pd.concat([X_test_df, y_test.reset_index(drop=True)], axis=1)
 
-    if not auto_replace and (output / "train-stroke-data.feather").exists():
+    if not auto_replace and (output / "train-stroke-data.parquet").exists():
         typer.confirm(
-            "train-stroke-data.feather already exists. Overwrite?",
+            "train-stroke-data.parquet already exists. Overwrite?",
             abort=True,
         )
-    train_data.to_feather(output / "train-stroke-data.feather")
+    train_data.to_parquet(output / "train-stroke-data.parquet")
 
-    if not auto_replace and (output / "test-stroke-data.feather").exists():
+    if not auto_replace and (output / "test-stroke-data.parquet").exists():
         typer.confirm(
-            "test-stroke-data.feather already exists. Overwrite?",
+            "test-stroke-data.parquet already exists. Overwrite?",
             abort=True,
         )
-    test_data.to_feather(output / "test-stroke-data.feather")
+    test_data.to_parquet(output / "test-stroke-data.parquet")
 
 
 if __name__ == "__main__":
