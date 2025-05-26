@@ -1,0 +1,23 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/stroke_prediction/preprocess.py data/raw/healthcare-dataset-stroke-data.csv
+      data/processed/ -y
+    deps:
+    - path: data/raw/healthcare-dataset-stroke-data.csv
+      hash: md5
+      md5: 3f25a4c2f2963d969e1a156c08968577
+      size: 316971
+    - path: src/stroke_prediction/preprocess.py
+      hash: md5
+      md5: 7e246d1198703e31b22e7415e51e48e3
+      size: 5811
+    outs:
+    - path: data/processed/test-stroke-data.csv
+      hash: md5
+      md5: 52b67f5919ac8bc5ca93f30026b00668
+      size: 61078
+    - path: data/processed/train-stroke-data.csv
+      hash: md5
+      md5: 79cb379eb38185ceb0241e7331a94300
+      size: 243526
