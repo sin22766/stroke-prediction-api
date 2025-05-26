@@ -1,0 +1,6 @@
+data/
+.dvc/
+.venv/
+src/app/__pycache__
+notebooks/
+picture/
