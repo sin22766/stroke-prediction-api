@@ -1,3 +1,4 @@
+import pickle
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -81,7 +82,10 @@ def get_train_pipeline(
     )
 
 
-def get_prod_pipeline() -> Pipeline:
+def get_prod_pipeline(
+    drop_columns: list[str] = ["gender", "residence_type"],
+    one_hot_columns: list[str] = DEFAULT_ONE_HOT_COLUMNS,
+) -> Pipeline:
     """
     Create a production preprocessing pipeline without imputation.
 
@@ -92,7 +96,7 @@ def get_prod_pipeline() -> Pipeline:
     """
     return Pipeline(
         [
-            ("column_transformer", get_col_transformer()),
+            ("column_transformer", get_col_transformer(drop_columns, one_hot_columns)),
         ]
     )
 
@@ -104,6 +108,7 @@ app = typer.Typer()
 def preprocess_data(
     input: Path,
     output: Path,
+    preprocessor: Path,
     auto_replace: Annotated[
         bool, typer.Option("-y", help="Automatic overwrite the output")
     ] = False,
@@ -116,9 +121,6 @@ def preprocess_data(
     params_file: Annotated[
         Optional[Path], typer.Option("--params", help="Path to the parameters file")
     ] = None,
-    experiment_name: Annotated[
-        Optional[str], typer.Option("--experiment", help="Name of the experiment")
-    ] = "Data Preprocessing",
 ):
     """
     Preprocess input CSV data for stroke prediction. Applies transformations and splits into train/test sets.
@@ -129,6 +131,8 @@ def preprocess_data(
         Path to the input CSV file containing raw data.
     output : Path
         Directory path where the processed files will be saved.
+    preprocessor : Path
+        Path to the preprocessor file (not used in this function, but can be used for future extensions).
     auto_replace : bool, optional
         Whether to automatically overwrite existing files, by default False.
     test_size : float, optional
@@ -229,6 +233,18 @@ def preprocess_data(
             abort=True,
         )
     test_data.to_parquet(output / "test-stroke-data.parquet")
+
+    if not auto_replace and (output / "preprocessor.pkl").exists():
+        typer.confirm(
+            "preprocessor.pkl already exists. Overwrite?",
+            abort=True,
+        )
+    
+    prod_pipeline = get_prod_pipeline(one_hot_columns=["work_type", "smoking_status"])
+    prod_pipeline.fit(X_train.rename(columns={"Residence_type": "residence_type"}).drop(columns=["id"]))
+    
+    with open(preprocessor, "wb") as f:
+        pickle.dump(prod_pipeline, f)
 
 
 @app.command()

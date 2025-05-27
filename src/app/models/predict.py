@@ -27,7 +27,7 @@ class PatientData(BaseModel):
         gt=0, title="Average Glucose Level", description="Average glucose level of the patient"
     )
     bmi: float = Field(gt=0, title="BMI", description="Body Mass Index of the patient")
-    smoking_status: Literal["never smoked", "formerly smoked", "smokes", "unknown"] = Field(
+    smoking_status: Literal["never smoked", "formerly smoked", "smokes", "Unknown"] = Field(
         title="Smoking Status", description="Smoking status of the patient"
     )
 
@@ -35,5 +35,5 @@ class PatientData(BaseModel):
 class StrokePrediction(BaseModel):
     stroke: bool = Field(title="Stroke", description="Stroke prediction result")
     confidence: float = Field(
-        gt=0, le=1, title="Confidence", description="Confidence level of the stroke prediction"
+        ge=0, le=1, title="Confidence", description="Confidence level of the stroke prediction"
     )

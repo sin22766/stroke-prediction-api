@@ -1,2 +1,3 @@
 /catboost-model.cbm
 /model.onnx
+/preprocessor.pkl

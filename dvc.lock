@@ -2,7 +2,7 @@ schema: '2.0'
 stages:
   prepare:
     cmd: python src/stroke_prediction/preprocess.py preprocess-data data/raw/healthcare-dataset-stroke-data.csv
-      data/processed/ -y --params params.yaml
+      data/processed/ models/preprocessor.pkl -y --params params.yaml
     deps:
     - path: data/raw/healthcare-dataset-stroke-data.csv
       hash: md5
@@ -10,8 +10,8 @@ stages:
       size: 316971
     - path: src/stroke_prediction/preprocess.py
       hash: md5
-      md5: b33b4603d33ecceda4613e6c2e54a0e6
-      size: 10116
+      md5: 0e31095cfe9398bec9ebfa5a62470a38
+      size: 10747
     params:
       params.yaml:
         preprocess.test_size: 0.15
@@ -30,6 +30,10 @@ stages:
       hash: md5
       md5: c1266198a739cede0bfe4ec05fc84acd
       size: 18618
+    - path: models/preprocessor.pkl
+      hash: md5
+      md5: c304b7d99c2cc4c4f9a2580f96432cf2
+      size: 1975
   resample:
     cmd: python src/stroke_prediction/preprocess.py resample-data data/processed/train-stroke-data.parquet
       data/processed/train-stroke-data-resampled.parquet -y --params params.yaml
@@ -40,8 +44,8 @@ stages:
       size: 44059
     - path: src/stroke_prediction/preprocess.py
       hash: md5
-      md5: b33b4603d33ecceda4613e6c2e54a0e6
-      size: 10116
+      md5: 0e31095cfe9398bec9ebfa5a62470a38
+      size: 10747
     params:
       params.yaml:
         random_seed: 42
@@ -64,8 +68,8 @@ stages:
       size: 18618
     - path: src/stroke_prediction/train.py
       hash: md5
-      md5: a5f834dc756f9095fd38b1985e01ce93
-      size: 6171
+      md5: 2fcb1d6e2839e6b7a5136dc2cc606cbb
+      size: 6173
     params:
       params.yaml:
         catboost.auto_class_weights: Balanced
@@ -100,5 +104,5 @@ stages:
     outs:
     - path: models/model.onnx
       hash: md5
-      md5: df687d9a1d826b70e272dd4fee80e83b
+      md5: b8b22a0ece1b5c50d4dee5739996df8c
       size: 6964
