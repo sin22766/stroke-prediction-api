@@ -21,3 +21,6 @@ wheels/
 # Catboost files
 catboost_info/
 picture/
+
+# Credential file
+credential.py
