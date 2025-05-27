@@ -1,7 +1,7 @@
 schema: '2.0'
 stages:
   prepare:
-    cmd: python src/stroke_prediction/preprocess.py data/raw/healthcare-dataset-stroke-data.csv
+    cmd: python src/stroke_prediction/preprocess.py preprocess-data data/raw/healthcare-dataset-stroke-data.csv
       data/processed/ -y
     deps:
     - path: data/raw/healthcare-dataset-stroke-data.csv
@@ -10,14 +10,35 @@ stages:
       size: 316971
     - path: src/stroke_prediction/preprocess.py
       hash: md5
-      md5: d8274708e4846fb246ca13bd84b62402
-      size: 5817
+      md5: 878d531c179b01c92d3c3b37366054d2
+      size: 8729
     outs:
     - path: data/processed/test-stroke-data.parquet
       hash: md5
-      md5: 0e4759fe2a29375b47429d6b49bdab6a
-      size: 24005
+      md5: b4d9b1db5838e85db6a802023ca0b855
+      size: 19690
     - path: data/processed/train-stroke-data.parquet
       hash: md5
-      md5: d162ca42c96607a25a71e0743f8784ef
-      size: 79716
+      md5: fe2904250b4ca02f839965396211f038
+      size: 45067
+    - path: data/processed/val-stroke-data.parquet
+      hash: md5
+      md5: e4124531bfacd5a10023e01a2cae5280
+      size: 19638
+  resample:
+    cmd: python src/stroke_prediction/preprocess.py resample-data data/processed/train-stroke-data.parquet
+      data/processed/train-stroke-data-resampled.parquet -y
+    deps:
+    - path: data/processed/train-stroke-data.parquet
+      hash: md5
+      md5: fe2904250b4ca02f839965396211f038
+      size: 45067
+    - path: src/stroke_prediction/preprocess.py
+      hash: md5
+      md5: 878d531c179b01c92d3c3b37366054d2
+      size: 8729
+    outs:
+    - path: data/processed/train-stroke-data-resampled.parquet
+      hash: md5
+      md5: 747eebcd0407797524a83b1de53ab527
+      size: 210676

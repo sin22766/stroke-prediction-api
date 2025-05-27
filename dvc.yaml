@@ -1,9 +1,18 @@
 stages:
   prepare:
-    cmd:  python src/stroke_prediction/preprocess.py data/raw/healthcare-dataset-stroke-data.csv data/processed/ -y
+    cmd:  python src/stroke_prediction/preprocess.py preprocess-data data/raw/healthcare-dataset-stroke-data.csv data/processed/ -y
     deps:
     - data/raw/healthcare-dataset-stroke-data.csv
     - src/stroke_prediction/preprocess.py
     outs:
     - data/processed/train-stroke-data.parquet
+    - data/processed/val-stroke-data.parquet
     - data/processed/test-stroke-data.parquet
+  
+  resample:
+    cmd:  python src/stroke_prediction/preprocess.py resample-data data/processed/train-stroke-data.parquet data/processed/train-stroke-data-resampled.parquet -y
+    deps:
+    - data/processed/train-stroke-data.parquet
+    - src/stroke_prediction/preprocess.py
+    outs:
+    - data/processed/train-stroke-data-resampled.parquet

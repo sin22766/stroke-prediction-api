@@ -1,4 +1,4 @@
-/train-stroke-data.feather
-/test-stroke-data.feather
 /train-stroke-data.parquet
 /test-stroke-data.parquet
+/val-stroke-data.parquet
+/train-stroke-data-resampled.parquet

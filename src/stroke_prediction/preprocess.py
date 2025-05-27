@@ -2,10 +2,12 @@ from pathlib import Path
 
 import pandas as pd
 import typer
+from imblearn.over_sampling import BorderlineSMOTE
+from imblearn.pipeline import Pipeline
+from imblearn.under_sampling import NeighbourhoodCleaningRule
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import KNNImputer
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from typing_extensions import Annotated
 
@@ -99,9 +101,18 @@ app = typer.Typer()
 def preprocess_data(
     input: Path,
     output: Path,
-    auto_replace: Annotated[bool, typer.Option("-y", help="Automatic overwrite the output")] = False,
-    test_size: Annotated[float, typer.Option("--test-size", help="Splite size for test dataset range between (0.0 - 1.0)")] = 0.2,
-    random_state: Annotated[int, typer.Option("--seed", help="Seed for the split random generator")] = 42,
+    auto_replace: Annotated[
+        bool, typer.Option("-y", help="Automatic overwrite the output")
+    ] = False,
+    test_size: Annotated[
+        float, typer.Option(help="Fraction of data for test set (e.g., 0.15)")
+    ] = 0.15,
+    val_size: Annotated[
+        float, typer.Option(help="Fraction of data for validation set (e.g., 0.15)")
+    ] = 0.15,
+    random_state: Annotated[
+        int, typer.Option("--seed", help="Seed for the split random generator")
+    ] = 42,
 ):
     """
     Preprocess input CSV data for stroke prediction. Applies transformations and splits into train/test sets.
@@ -115,7 +126,10 @@ def preprocess_data(
     auto_replace : bool, optional
         Whether to automatically overwrite existing files, by default False.
     test_size : float, optional
-        Proportion of data to be used as test set, by default 0.2.
+        Proportion of data to be used as test set, by default 0.15.
+    val_size : float, optional
+        Proportion of data to be used as validation set, by default 0.15.
+        The sum of test_size and val_size must be less than 1.0.
     random_state : int, optional
         Random seed for reproducibility, by default 42.
 
@@ -136,16 +150,32 @@ def preprocess_data(
 
     X = data.drop("stroke", axis=1)
     y = data["stroke"]
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state, stratify=y
+
+    total = test_size + val_size
+    if total >= 1.0:
+        raise typer.Abort("test-size + val-size must be less than 1.0")
+
+    # Split the data into train, validation, and test sets
+    X_train, X_temp, y_train, y_temp = train_test_split(
+        X, y, test_size=total, random_state=random_state, stratify=y
+    )
+
+    test_ratio = test_size / total
+    X_val, X_test, y_val, y_test = train_test_split(
+        X_temp, y_temp, test_size=test_ratio, random_state=random_state, stratify=y_temp
     )
 
     train_pipeline = get_train_pipeline()
     X_train_transformed = train_pipeline.fit_transform(X_train)
+    X_val_transformed = train_pipeline.transform(X_val)
     X_test_transformed = train_pipeline.transform(X_test)
 
     X_train_df = pd.DataFrame(
         X_train_transformed,
+        columns=train_pipeline.named_steps["column_transformer"].get_feature_names_out(),
+    )
+    X_val_df = pd.DataFrame(
+        X_val_transformed,
         columns=train_pipeline.named_steps["column_transformer"].get_feature_names_out(),
     )
     X_test_df = pd.DataFrame(
@@ -154,6 +184,7 @@ def preprocess_data(
     )
 
     train_data = pd.concat([X_train_df, y_train.reset_index(drop=True)], axis=1)
+    val_data = pd.concat([X_val_df, y_val.reset_index(drop=True)], axis=1)
     test_data = pd.concat([X_test_df, y_test.reset_index(drop=True)], axis=1)
 
     if not auto_replace and (output / "train-stroke-data.parquet").exists():
@@ -163,12 +194,70 @@ def preprocess_data(
         )
     train_data.to_parquet(output / "train-stroke-data.parquet")
 
+    if not auto_replace and (output / "val-stroke-data.parquet").exists():
+        typer.confirm(
+            "val-stroke-data.parquet already exists. Overwrite?",
+            abort=True,
+        )
+    val_data.to_parquet(output / "val-stroke-data.parquet")
+
     if not auto_replace and (output / "test-stroke-data.parquet").exists():
         typer.confirm(
             "test-stroke-data.parquet already exists. Overwrite?",
             abort=True,
         )
     test_data.to_parquet(output / "test-stroke-data.parquet")
+
+
+@app.command()
+def resample_data(
+    input: Path,
+    output: Path,
+    auto_replace: Annotated[
+        bool, typer.Option("-y", help="Automatic overwrite the output")
+    ] = False,
+    random_state: Annotated[
+        int, typer.Option("--seed", help="Seed for the split random generator")
+    ] = 42,
+):
+    """
+    Resample the input data to balance the classes.
+
+    Parameters
+    ----------
+    input : Path
+        Path to the input CSV file containing raw data.
+    output : Path
+        Directory path where the resampled file will be saved.
+    auto_replace : bool, optional
+        Whether to automatically overwrite existing files, by default False.
+    """
+    if not input.exists() or not input.is_file():
+        raise typer.Abort("Input file does not exist or is not a file.")
+
+    data = pd.read_parquet(input)
+    if data.empty:
+        raise typer.Abort("Input data is empty.")
+
+    X = data.drop("stroke", axis=1)
+    y = data["stroke"]
+
+    resample_pipeline = Pipeline([
+        ("oversampling", BorderlineSMOTE(random_state=random_state)),
+        ("downsampling", NeighbourhoodCleaningRule()),
+    ])
+
+    X_resampled, y_resampled = resample_pipeline.fit_resample(X, y)
+
+    resampled_data = pd.concat([X_resampled, y_resampled.reset_index(drop=True)], axis=1)
+
+    if not auto_replace and output.exists():
+        typer.confirm(
+            f"{output.name} already exists. Overwrite?",
+            abort=True,
+        )
+
+    resampled_data.to_parquet(output)
 
 
 if __name__ == "__main__":
