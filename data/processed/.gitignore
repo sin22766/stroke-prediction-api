@@ -1,2 +1,4 @@
-/train-stroke-data.csv
-/test-stroke-data.csv
+/train-stroke-data.parquet
+/test-stroke-data.parquet
+/val-stroke-data.parquet
+/train-stroke-data-resampled.parquet
