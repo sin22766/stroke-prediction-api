@@ -1,11 +1,18 @@
-FROM python:3.12-slim
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
+# Set the working directory
 WORKDIR /app
 
-COPY ./ .
+# Copy project metadata files for dependency resolution and source code
+COPY pyproject.toml /app/
+COPY uv.lock /app/
+COPY src /app/src
 
-RUN pip install .
+# Install dependencies from pyproject.toml using uv
+RUN uv pip install --system --no-cache-dir .
 
-EXPOSE 8100
+# Expose FastAPI default port
+EXPOSE 8000
 
-CMD ["fastapi","run","src/app/main.py"]
+# Run the FastAPI application
+CMD ["fastapi", "run", "--host", "0.0.0.0", "--port", "8000", "src/app/main.py"]
