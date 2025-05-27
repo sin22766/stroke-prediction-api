@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 import typer
@@ -10,6 +11,8 @@ from sklearn.impute import KNNImputer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from typing_extensions import Annotated
+
+from stroke_prediction.util import read_yaml
 
 DEFAULT_DROP_COLUMNS = ["id", "gender", "Residence_type"]
 DEFAULT_ONE_HOT_COLUMNS = ["ever_married", "work_type", "smoking_status"]
@@ -45,6 +48,7 @@ def get_col_transformer(
         ],
         remainder="passthrough",
         force_int_remainder_cols=False,
+        verbose_feature_names_out=False,
     )
 
 
@@ -110,9 +114,9 @@ def preprocess_data(
     val_size: Annotated[
         float, typer.Option(help="Fraction of data for validation set (e.g., 0.15)")
     ] = 0.15,
-    random_state: Annotated[
-        int, typer.Option("--seed", help="Seed for the split random generator")
-    ] = 42,
+    params_file: Annotated[
+        Optional[Path], typer.Option("--params", help="Path to the parameters file")
+    ] = None,
 ):
     """
     Preprocess input CSV data for stroke prediction. Applies transformations and splits into train/test sets.
@@ -130,8 +134,8 @@ def preprocess_data(
     val_size : float, optional
         Proportion of data to be used as validation set, by default 0.15.
         The sum of test_size and val_size must be less than 1.0.
-    random_state : int, optional
-        Random seed for reproducibility, by default 42.
+    params_file : Optional[Path], optional
+        Path to a file containing additional parameters for preprocessing, by default None.
 
     Raises
     ------
@@ -143,6 +147,22 @@ def preprocess_data(
 
     if not output.exists() or not output.is_dir():
         raise typer.Abort("Output path does not exist or is not a directory.")
+    
+    if params_file is not None and not params_file.exists():
+        raise typer.Abort("Parameters file does not exist.")
+    
+    random_state = 42  # Default random state
+    
+    if params_file is not None:
+        params = read_yaml(params_file)
+        
+        if "preprocess" in params:
+            preprocess_params = params["preprocess"]
+            test_size = preprocess_params.get("test_size", test_size)
+            val_size = preprocess_params.get("val_size", val_size)
+        
+        if "random_seed" in params:
+            random_state = params["random_seed"]
 
     data = pd.read_csv(input)
     if data.empty:
@@ -216,9 +236,9 @@ def resample_data(
     auto_replace: Annotated[
         bool, typer.Option("-y", help="Automatic overwrite the output")
     ] = False,
-    random_state: Annotated[
-        int, typer.Option("--seed", help="Seed for the split random generator")
-    ] = 42,
+    params_file: Annotated[
+        Optional[Path], typer.Option("--params", help="Path to the parameters file")
+    ] = None,
 ):
     """
     Resample the input data to balance the classes.
@@ -231,9 +251,22 @@ def resample_data(
         Directory path where the resampled file will be saved.
     auto_replace : bool, optional
         Whether to automatically overwrite existing files, by default False.
+    params_file : Optional[Path], optional
+        Path to a file containing additional parameters for resampling, by default None.
     """
     if not input.exists() or not input.is_file():
         raise typer.Abort("Input file does not exist or is not a file.")
+    
+    if params_file is not None and not params_file.exists():
+        raise typer.Abort("Parameters file does not exist.")
+    
+    random_state = 42  # Default random state
+    
+    if params_file is not None:
+        params = read_yaml(params_file) 
+        if "random_seed" in params:
+            random_state = params["random_seed"]
+        
 
     data = pd.read_parquet(input)
     if data.empty:

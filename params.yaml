@@ -1,0 +1,10 @@
+random_seed: 42
+preprocess:
+  test_size: 0.15
+  val_size: 0.15
+model:
+  colsample_bylevel: 0.09512938089563211
+  depth: 8
+  l2_leaf_reg: 8.115228714496485
+  boosting_type: "Plain"
+  bootstrap_type: "MVS"

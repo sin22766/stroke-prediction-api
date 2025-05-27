@@ -1,4 +1,26 @@
+from pathlib import Path
+
 import mlflow
+from ruamel.yaml import YAML
+
+
+def read_yaml(file: Path):
+    """
+    Read a YAML file and return its content as a dictionary.
+
+    Parameters
+    ----------
+    file : Path
+        The path to the YAML file to be read.
+
+    Returns
+    -------
+    dict
+        The content of the YAML file as a dictionary.
+    """
+    yaml = YAML(typ="safe")
+    with open(file, "r") as f:
+        return yaml.load(f)
 
 
 def get_or_create_experiment(experiment_name):
