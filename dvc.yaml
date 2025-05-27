@@ -1,40 +1,67 @@
 stages:
   prepare:
-    cmd:  python src/stroke_prediction/preprocess.py preprocess-data data/raw/healthcare-dataset-stroke-data.csv data/processed/ -y
+    cmd: python src/stroke_prediction/preprocess.py preprocess-data data/raw/healthcare-dataset-stroke-data.csv data/processed/ -y --params params.yaml
     params:
       - preprocess.test_size
       - preprocess.val_size
       - random_seed
     deps:
-    - data/raw/healthcare-dataset-stroke-data.csv
-    - src/stroke_prediction/preprocess.py
+      - data/raw/healthcare-dataset-stroke-data.csv
+      - src/stroke_prediction/preprocess.py
     outs:
-    - data/processed/train-stroke-data.parquet
-    - data/processed/val-stroke-data.parquet
-    - data/processed/test-stroke-data.parquet
-  
+      - data/processed/train-stroke-data.parquet
+      - data/processed/val-stroke-data.parquet
+      - data/processed/test-stroke-data.parquet
+
   resample:
-    cmd:  python src/stroke_prediction/preprocess.py resample-data data/processed/train-stroke-data.parquet data/processed/train-stroke-data-resampled.parquet -y
+    cmd: python src/stroke_prediction/preprocess.py resample-data data/processed/train-stroke-data.parquet data/processed/train-stroke-data-resampled.parquet -y --params params.yaml
     params:
       - random_seed
     deps:
-    - data/processed/train-stroke-data.parquet
-    - src/stroke_prediction/preprocess.py
+      - data/processed/train-stroke-data.parquet
+      - src/stroke_prediction/preprocess.py
     outs:
-    - data/processed/train-stroke-data-resampled.parquet
-  
+      - data/processed/train-stroke-data-resampled.parquet
+
   train:
-    cmd:  python src/stroke_prediction/train.py data/processed/train-stroke-data-resampled.parquet data/processed/val-stroke-data.parquet models/catboost-model.cbm -y
+    cmd: python src/stroke_prediction/train.py data/processed/train-stroke-data-resampled.parquet data/processed/val-stroke-data.parquet models/model.onnx -y --params params.yaml
     params:
-      - model.colsample_bylevel
-      - model.depth
-      - model.l2_leaf_reg
-      - model.boosting_type
-      - model.bootstrap_type
-      - random_seed
+      - model_type
+
+      - catboost.iterations
+      - catboost.colsample_bylevel
+      - catboost.depth
+      - catboost.l2_leaf_reg
+      - catboost.boosting_type
+      - catboost.bootstrap_type
+      - catboost.eval_metric
+      - catboost.auto_class_weights
+
+      - random_forest.n_estimators
+      - random_forest.criterion
+      - random_forest.max_depth
+      - random_forest.min_samples_split
+      - random_forest.min_samples_leaf
+
+      - decision_tree.max_depth
+      - decision_tree.min_samples_leaf
+      - decision_tree.min_samples_split
+      - decision_tree.criterion
+      - decision_tree.splitter
+
+      - mlp.max_iter
+      - mlp.hidden_layer_sizes
+      - mlp.activation
+      - mlp.solver
+      - mlp.alpha
+      - mlp.learning_rate_init
+      - mlp.beta_1
+      - mlp.beta_2
+      - mlp.epsilon
+      - mlp.learning_rate
     deps:
-    - data/processed/train-stroke-data-resampled.parquet
-    - data/processed/val-stroke-data.parquet
-    - src/stroke_prediction/train.py
+      - data/processed/train-stroke-data-resampled.parquet
+      - data/processed/val-stroke-data.parquet
+      - src/stroke_prediction/train.py
     outs:
-    - models/catboost-model.cbm
+      - models/model.onnx

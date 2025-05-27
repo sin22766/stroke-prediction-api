@@ -1,10 +1,42 @@
 random_seed: 42
+model_type: "decision_tree"  # Options: "catboost", "decision_tree", "random_forest", "mlp"
+
 preprocess:
   test_size: 0.15
   val_size: 0.15
-model:
+
+catboost:
+  iterations: 1000
   colsample_bylevel: 0.09512938089563211
   depth: 8
   l2_leaf_reg: 8.115228714496485
   boosting_type: "Plain"
   bootstrap_type: "MVS"
+  eval_metric: "F1"
+  auto_class_weights: "Balanced"
+
+decision_tree:
+  max_depth: 8
+  min_samples_leaf: 1
+  min_samples_split: 2
+  criterion: "gini"
+  splitter: "best"
+
+random_forest:
+  n_estimators: 197
+  criterion: "gini"
+  max_depth: 4
+  min_samples_split: 6
+  min_samples_leaf: 1
+
+mlp:
+  max_iter: 300
+  hidden_layer_sizes: 166
+  activation: "relu"
+  solver: "adam"
+  alpha: 0.0015382308040279
+  learning_rate_init: 0.0034877126245459306
+  beta_1: 0.5296178606936361
+  beta_2: 0.935488107125883
+  epsilon: 2.907208890659844e-08
+  learning_rate: "adaptive"

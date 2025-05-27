@@ -6,13 +6,16 @@ from app.models.predict import PatientData, StrokePrediction
 app = FastAPI()
 header_scheme = APIKeyHeader(name="x-key")
 
+
 @app.get("/")
 def root():
     return {"message": "Hello World"}
 
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
 
 @app.get("/predict")
 def predict(input: PatientData, key: str = Depends(header_scheme)) -> StrokePrediction:
@@ -26,7 +29,7 @@ def predict(input: PatientData, key: str = Depends(header_scheme)) -> StrokePred
         The patient data containing various health metrics and demographics.
     key : str
         The API key for authentication, provided in the request header `x-key`.
-    
+
     Returns
     -------
     StrokePrediction
@@ -35,8 +38,8 @@ def predict(input: PatientData, key: str = Depends(header_scheme)) -> StrokePred
 
     if key != "expected_api_key":
         raise HTTPException(status_code=403, detail="Forbidden: Invalid API Key")
-    
+
     return StrokePrediction(
         stroke=False,  # Placeholder for actual prediction logic
-        confidence=0.0  # Placeholder for actual confidence score
+        confidence=0.0,  # Placeholder for actual confidence score
     )

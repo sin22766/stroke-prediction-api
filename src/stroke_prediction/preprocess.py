@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
 import pandas as pd
 import typer
@@ -10,7 +10,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import KNNImputer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from typing_extensions import Annotated
 
 from stroke_prediction.util import read_yaml
 
@@ -117,6 +116,9 @@ def preprocess_data(
     params_file: Annotated[
         Optional[Path], typer.Option("--params", help="Path to the parameters file")
     ] = None,
+    experiment_name: Annotated[
+        Optional[str], typer.Option("--experiment", help="Name of the experiment")
+    ] = "Data Preprocessing",
 ):
     """
     Preprocess input CSV data for stroke prediction. Applies transformations and splits into train/test sets.
@@ -147,20 +149,20 @@ def preprocess_data(
 
     if not output.exists() or not output.is_dir():
         raise typer.Abort("Output path does not exist or is not a directory.")
-    
+
     if params_file is not None and not params_file.exists():
         raise typer.Abort("Parameters file does not exist.")
-    
+
     random_state = 42  # Default random state
-    
+
     if params_file is not None:
         params = read_yaml(params_file)
-        
+
         if "preprocess" in params:
             preprocess_params = params["preprocess"]
             test_size = preprocess_params.get("test_size", test_size)
             val_size = preprocess_params.get("val_size", val_size)
-        
+
         if "random_seed" in params:
             random_state = params["random_seed"]
 
@@ -256,17 +258,16 @@ def resample_data(
     """
     if not input.exists() or not input.is_file():
         raise typer.Abort("Input file does not exist or is not a file.")
-    
+
     if params_file is not None and not params_file.exists():
         raise typer.Abort("Parameters file does not exist.")
-    
+
     random_state = 42  # Default random state
-    
+
     if params_file is not None:
-        params = read_yaml(params_file) 
+        params = read_yaml(params_file)
         if "random_seed" in params:
             random_state = params["random_seed"]
-        
 
     data = pd.read_parquet(input)
     if data.empty:
@@ -275,10 +276,12 @@ def resample_data(
     X = data.drop("stroke", axis=1)
     y = data["stroke"]
 
-    resample_pipeline = Pipeline([
-        ("oversampling", BorderlineSMOTE(random_state=random_state)),
-        ("downsampling", NeighbourhoodCleaningRule()),
-    ])
+    resample_pipeline = Pipeline(
+        [
+            ("oversampling", BorderlineSMOTE(random_state=random_state)),
+            ("downsampling", NeighbourhoodCleaningRule()),
+        ]
+    )
 
     X_resampled, y_resampled = resample_pipeline.fit_resample(X, y)
 
