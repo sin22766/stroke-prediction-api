@@ -2,7 +2,7 @@ schema: '2.0'
 stages:
   prepare:
     cmd: python src/stroke_prediction/preprocess.py preprocess-data data/raw/healthcare-dataset-stroke-data.csv
-      data/processed/ -y
+      data/processed/ -y --params params.yaml
     deps:
     - path: data/raw/healthcare-dataset-stroke-data.csv
       hash: md5
@@ -10,8 +10,8 @@ stages:
       size: 316971
     - path: src/stroke_prediction/preprocess.py
       hash: md5
-      md5: beb8ca84f3ff2055e214a2ebfeaf8cd7
-      size: 9970
+      md5: b33b4603d33ecceda4613e6c2e54a0e6
+      size: 10116
     params:
       params.yaml:
         preprocess.test_size: 0.15
@@ -32,7 +32,7 @@ stages:
       size: 18618
   resample:
     cmd: python src/stroke_prediction/preprocess.py resample-data data/processed/train-stroke-data.parquet
-      data/processed/train-stroke-data-resampled.parquet -y
+      data/processed/train-stroke-data-resampled.parquet -y --params params.yaml
     deps:
     - path: data/processed/train-stroke-data.parquet
       hash: md5
@@ -40,8 +40,8 @@ stages:
       size: 44059
     - path: src/stroke_prediction/preprocess.py
       hash: md5
-      md5: beb8ca84f3ff2055e214a2ebfeaf8cd7
-      size: 9970
+      md5: b33b4603d33ecceda4613e6c2e54a0e6
+      size: 10116
     params:
       params.yaml:
         random_seed: 42
@@ -52,7 +52,7 @@ stages:
       size: 209668
   train:
     cmd: python src/stroke_prediction/train.py data/processed/train-stroke-data-resampled.parquet
-      data/processed/val-stroke-data.parquet models/catboost-model.cbm -y
+      data/processed/val-stroke-data.parquet models/model.onnx -y --params params.yaml
     deps:
     - path: data/processed/train-stroke-data-resampled.parquet
       hash: md5
@@ -64,18 +64,41 @@ stages:
       size: 18618
     - path: src/stroke_prediction/train.py
       hash: md5
-      md5: 1e61d491de1184a6c8e3b6b15f8f0367
-      size: 4131
+      md5: a5f834dc756f9095fd38b1985e01ce93
+      size: 6171
     params:
       params.yaml:
-        model.boosting_type: Plain
-        model.bootstrap_type: MVS
-        model.colsample_bylevel: 0.09512938089563211
-        model.depth: 8
-        model.l2_leaf_reg: 8.115228714496485
-        random_seed: 42
+        catboost.auto_class_weights: Balanced
+        catboost.boosting_type: Plain
+        catboost.bootstrap_type: MVS
+        catboost.colsample_bylevel: 0.09512938089563211
+        catboost.depth: 8
+        catboost.eval_metric: F1
+        catboost.iterations: 1000
+        catboost.l2_leaf_reg: 8.115228714496485
+        decision_tree.criterion: gini
+        decision_tree.max_depth: 8
+        decision_tree.min_samples_leaf: 1
+        decision_tree.min_samples_split: 2
+        decision_tree.splitter: best
+        mlp.activation: relu
+        mlp.alpha: 0.0015382308040279
+        mlp.beta_1: 0.5296178606936361
+        mlp.beta_2: 0.935488107125883
+        mlp.epsilon: 2.907208890659844e-08
+        mlp.hidden_layer_sizes: 166
+        mlp.learning_rate: adaptive
+        mlp.learning_rate_init: 0.0034877126245459306
+        mlp.max_iter: 300
+        mlp.solver: adam
+        model_type: decision_tree
+        random_forest.criterion: gini
+        random_forest.max_depth: 4
+        random_forest.min_samples_leaf: 1
+        random_forest.min_samples_split: 6
+        random_forest.n_estimators: 197
     outs:
-    - path: models/catboost-model.cbm
+    - path: models/model.onnx
       hash: md5
-      md5: bf8aa03d6e4bd2370f8bb593aaf86af8
-      size: 121184
+      md5: df687d9a1d826b70e272dd4fee80e83b
+      size: 6964
