@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
 import pandas as pd
 import typer
@@ -10,13 +10,11 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import KNNImputer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from typing_extensions import Annotated
 
 from stroke_prediction.util import read_yaml
 
 DEFAULT_DROP_COLUMNS = ["id", "gender", "Residence_type"]
 DEFAULT_ONE_HOT_COLUMNS = ["ever_married", "work_type", "smoking_status"]
-
 
 def get_col_transformer(
     drop_columns: list[str] = DEFAULT_DROP_COLUMNS,
@@ -117,6 +115,9 @@ def preprocess_data(
     params_file: Annotated[
         Optional[Path], typer.Option("--params", help="Path to the parameters file")
     ] = None,
+    experiment_name: Annotated[
+        Optional[str], typer.Option("--experiment", help="Name of the experiment")
+    ] = "Data Preprocessing",
 ):
     """
     Preprocess input CSV data for stroke prediction. Applies transformations and splits into train/test sets.

@@ -10,8 +10,8 @@ stages:
       size: 316971
     - path: src/stroke_prediction/preprocess.py
       hash: md5
-      md5: 1708529645ef0c6f5dd4935fa14bd98a
-      size: 10000
+      md5: beb8ca84f3ff2055e214a2ebfeaf8cd7
+      size: 9970
     params:
       params.yaml:
         preprocess.test_size: 0.15
@@ -40,8 +40,8 @@ stages:
       size: 44059
     - path: src/stroke_prediction/preprocess.py
       hash: md5
-      md5: 1708529645ef0c6f5dd4935fa14bd98a
-      size: 10000
+      md5: beb8ca84f3ff2055e214a2ebfeaf8cd7
+      size: 9970
     params:
       params.yaml:
         random_seed: 42
@@ -64,8 +64,8 @@ stages:
       size: 18618
     - path: src/stroke_prediction/train.py
       hash: md5
-      md5: de80ff542a44eff5b757cf8715314fa7
-      size: 4161
+      md5: 1e61d491de1184a6c8e3b6b15f8f0367
+      size: 4131
     params:
       params.yaml:
         model.boosting_type: Plain
@@ -77,5 +77,5 @@ stages:
     outs:
     - path: models/catboost-model.cbm
       hash: md5
-      md5: 70ec773c5b0432597389cd075361cc89
+      md5: bf8aa03d6e4bd2370f8bb593aaf86af8
       size: 121184

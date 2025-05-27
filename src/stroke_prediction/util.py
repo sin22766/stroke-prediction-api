@@ -3,6 +3,7 @@ from pathlib import Path
 import mlflow
 from ruamel.yaml import YAML
 
+mlflow.set_tracking_uri("https://mlflow.spikehub.win/")
 
 def read_yaml(file: Path):
     """

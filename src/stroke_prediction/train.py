@@ -1,10 +1,9 @@
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
 import pandas as pd
 import typer
 from catboost import CatBoostClassifier, Pool
-from typing_extensions import Annotated
 
 from stroke_prediction.util import read_yaml
 
