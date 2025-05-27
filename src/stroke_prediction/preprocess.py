@@ -16,6 +16,7 @@ from stroke_prediction.util import read_yaml
 DEFAULT_DROP_COLUMNS = ["id", "gender", "Residence_type"]
 DEFAULT_ONE_HOT_COLUMNS = ["ever_married", "work_type", "smoking_status"]
 
+
 def get_col_transformer(
     drop_columns: list[str] = DEFAULT_DROP_COLUMNS,
     one_hot_columns: list[str] = DEFAULT_ONE_HOT_COLUMNS,
@@ -148,20 +149,20 @@ def preprocess_data(
 
     if not output.exists() or not output.is_dir():
         raise typer.Abort("Output path does not exist or is not a directory.")
-    
+
     if params_file is not None and not params_file.exists():
         raise typer.Abort("Parameters file does not exist.")
-    
+
     random_state = 42  # Default random state
-    
+
     if params_file is not None:
         params = read_yaml(params_file)
-        
+
         if "preprocess" in params:
             preprocess_params = params["preprocess"]
             test_size = preprocess_params.get("test_size", test_size)
             val_size = preprocess_params.get("val_size", val_size)
-        
+
         if "random_seed" in params:
             random_state = params["random_seed"]
 
@@ -257,17 +258,16 @@ def resample_data(
     """
     if not input.exists() or not input.is_file():
         raise typer.Abort("Input file does not exist or is not a file.")
-    
+
     if params_file is not None and not params_file.exists():
         raise typer.Abort("Parameters file does not exist.")
-    
+
     random_state = 42  # Default random state
-    
+
     if params_file is not None:
-        params = read_yaml(params_file) 
+        params = read_yaml(params_file)
         if "random_seed" in params:
             random_state = params["random_seed"]
-        
 
     data = pd.read_parquet(input)
     if data.empty:
@@ -276,10 +276,12 @@ def resample_data(
     X = data.drop("stroke", axis=1)
     y = data["stroke"]
 
-    resample_pipeline = Pipeline([
-        ("oversampling", BorderlineSMOTE(random_state=random_state)),
-        ("downsampling", NeighbourhoodCleaningRule()),
-    ])
+    resample_pipeline = Pipeline(
+        [
+            ("oversampling", BorderlineSMOTE(random_state=random_state)),
+            ("downsampling", NeighbourhoodCleaningRule()),
+        ]
+    )
 
     X_resampled, y_resampled = resample_pipeline.fit_resample(X, y)
 

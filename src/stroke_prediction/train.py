@@ -21,6 +21,7 @@ class SupportedModels(str, Enum):
     DECISION_TREE = "decision_tree"
     RANDOM_FOREST = "random_forest"
 
+
 DEFAULT_PARAMS = {
     "catboost": {
         "iterations": 1000,
@@ -175,7 +176,7 @@ def train_model(
     if model_name == "catboost":
         model.save_model(model_output, format="onnx")
     else:
-        initial_type = [('input', FloatTensorType([None, X_val.shape[1]]))]
+        initial_type = [("input", FloatTensorType([None, X_val.shape[1]]))]
         onnx_model = convert_sklearn(model, initial_types=initial_type)
         onnx.save_model(onnx_model, model_output)
 

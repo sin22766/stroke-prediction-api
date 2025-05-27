@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from typing import Annotated
 
@@ -18,6 +17,7 @@ from stroke_prediction.plot import plot_feature_importance
 from stroke_prediction.util import get_or_create_experiment
 
 app = typer.Typer()
+
 
 @app.command()
 def evaluate_model(

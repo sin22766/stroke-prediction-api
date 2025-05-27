@@ -5,6 +5,7 @@ from ruamel.yaml import YAML
 
 mlflow.set_tracking_uri("https://mlflow.spikehub.win/")
 
+
 def read_yaml(file: Path):
     """
     Read a YAML file and return its content as a dictionary.
