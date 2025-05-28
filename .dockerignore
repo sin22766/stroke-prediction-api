@@ -1,6 +1,46 @@
-data/
-.dvc/
+# Docker
+docker-compose.yml
+Dockerfile
+.docker
+.dockerignore
+
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+**/*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+.env
 .venv/
-src/app/__pycache__
+venv/
+
+# Temporary files
+models/
+data/
+evidently_report/
+
+# Notebooks
 notebooks/
+*.ipynb
+
+# VScode-generated files
+.vscode/
+
+# Ruff cache
+.ruff_cache/
+
+# Catboost files
+catboost_info/
 picture/
+
+# Metadata files
+README.md
+LICENSE
