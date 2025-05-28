@@ -12,12 +12,16 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "scikit-learn>=1.6.1",
     "pandas>=2.2.3",
+    "fastparquet>=2024.11.0",
     "catboost>=1.2.8",
     "imbalanced-learn>=0.13.0",
     "mlflow>=2.22.0",
     "ruamel-yaml==0.18.10",
     "onnxruntime>=1.22.0",
     "onnx==1.17.0",
+    "skl2onnx>=1.18.0",
+    "typer>=0.15.4",
+    "dvc[s3]>=3.59.2",
 ]
 
 [dependency-groups]
@@ -29,12 +33,9 @@ dev = [
     "poethepoet>=0.34.0",
     "lefthook>=1.11.13",
     "pdoc>=15.0.3",
-    "fastparquet>=2024.11.0",
-    "typer>=0.15.4",
     "optuna>=4.3.0",
     "ipywidgets>=8.1.7",
     "shap>=0.47.2",
-    "skl2onnx>=1.18.0",
 ]
 
 [tool.uv]
